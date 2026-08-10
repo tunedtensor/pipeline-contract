@@ -1,0 +1,61 @@
+{
+  "name": "@tuned-tensor/pipeline-contract",
+  "version": "1.0.0",
+  "description": "Portable ordered Pipeline v1 contract for Tuned Tensor local and cloud runtimes",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./schema": "./schema/pipeline-v1.schema.json",
+    "./fixtures/*": "./fixtures/*"
+  },
+  "files": [
+    "dist",
+    "schema",
+    "fixtures",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "prepack": "npm run build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "pack:check": "npm pack --dry-run --json"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "keywords": [
+    "tuned-tensor",
+    "pipeline",
+    "workflow",
+    "schema",
+    "fine-tuning"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tunedtensor/pipeline-contract.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.5",
+    "ajv": "^8.17.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.8"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tunedtensor.com/schemas/pipeline-v1.schema.json",
+  "title": "Tuned Tensor Pipeline v1",
+  "description": "Portable ordered pipeline document. Semantic dependency and placement validation is performed by parsePipeline().",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "steps"],
+  "properties": {
+    "version": { "const": 1 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "target": { "$ref": "#/$defs/target" },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "items": { "$ref": "#/$defs/step" }
+    }
+  },
+  "$defs": {
+    "target": {
+      "type": "string",
+      "enum": ["local", "cloud"]
+    },
+    "stepId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "artifactReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from"],
+      "properties": {
+        "from": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]*\\.[a-z][a-z0-9_]*$"
+        }
+      }
+    },
+    "trainStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uses"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stepId" },
+        "uses": { "const": "train" },
+        "target": { "$ref": "#/$defs/target" }
+      }
+    },
+    "evaluateStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uses", "with"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stepId" },
+        "uses": { "const": "evaluate" },
+        "target": { "$ref": "#/$defs/target" },
+        "with": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["model"],
+          "properties": {
+            "model": {
+              "oneOf": [
+                { "const": "base" },
+                { "$ref": "#/$defs/artifactReference" }
+              ]
+            },
+            "evaluator": { "const": "behavior", "default": "behavior" }
+          }
+        }
+      }
+    },
+    "compareStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uses", "with"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stepId" },
+        "uses": { "const": "compare" },
+        "target": { "$ref": "#/$defs/target" },
+        "with": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["before", "after"],
+          "properties": {
+            "before": { "$ref": "#/$defs/artifactReference" },
+            "after": { "$ref": "#/$defs/artifactReference" }
+          }
+        }
+      }
+    },
+    "step": {
+      "oneOf": [
+        { "$ref": "#/$defs/trainStep" },
+        { "$ref": "#/$defs/evaluateStep" },
+        { "$ref": "#/$defs/compareStep" }
+      ]
+    }
+  }
+}

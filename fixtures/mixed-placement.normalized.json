@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "name": "local-train-cloud-eval",
+  "steps": [
+    { "id": "train", "uses": "train", "target": "local" },
+    { "id": "candidate", "uses": "evaluate", "target": "cloud", "with": { "model": { "from": "train.model" }, "evaluator": "behavior" } }
+  ]
+}

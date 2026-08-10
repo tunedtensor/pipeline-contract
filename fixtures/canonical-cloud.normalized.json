@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "name": "default-cloud",
+  "steps": [
+    { "id": "baseline", "uses": "evaluate", "target": "cloud", "with": { "model": "base", "evaluator": "behavior" } },
+    { "id": "train", "uses": "train", "target": "cloud" },
+    { "id": "candidate", "uses": "evaluate", "target": "cloud", "with": { "model": { "from": "train.model" }, "evaluator": "behavior" } },
+    { "id": "compare", "uses": "compare", "target": "cloud", "with": { "before": { "from": "baseline.report" }, "after": { "from": "candidate.report" } } }
+  ]
+}

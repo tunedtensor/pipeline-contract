@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "name": "evaluation-only",
+  "steps": [
+    { "id": "baseline", "uses": "evaluate", "target": "local", "with": { "model": "base", "evaluator": "behavior" } }
+  ]
+}

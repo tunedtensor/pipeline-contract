@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "target": "cloud",
+  "steps": [
+    { "id": "candidate", "uses": "evaluate", "with": { "model": { "from": "train.model" } } },
+    { "id": "train", "uses": "train" }
+  ]
+}
