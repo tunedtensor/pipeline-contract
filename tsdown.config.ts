@@ -1,4 +1,4 @@
-import { defineConfig } from "tsup";
+import { defineConfig } from "tsdown";
 
 export default defineConfig({
   entry: ["src/index.ts"],
@@ -7,7 +7,7 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   target: "node22",
-  outExtension({ format }) {
+  outExtensions({ format }) {
     return { js: format === "cjs" ? ".cjs" : ".js" };
   },
 });
