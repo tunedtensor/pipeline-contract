@@ -88,7 +88,9 @@ npm ci
 npm run typecheck
 npm test
 npm run build
+npm run package:lint
 npm run pack:check
+npm run pack:test
 ```
 
 ## Release discipline
