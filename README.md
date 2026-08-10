@@ -1,8 +1,6 @@
 # `@tuned-tensor/pipeline-contract`
 
-Portable, versioned Pipeline v1 contract intended to be shared by Tuned Tensor's local and hosted execution boundaries.
-
-The package is the migration target for `tuned-tensor-cli`, `tuned-tensor`, and `tuned-tensor-runs`; those consumers have not yet been switched to this dependency.
+Portable, versioned Pipeline v1 contract shared by Tuned Tensor's local and hosted execution boundaries.
 
 This repository is deliberately **contract-only**. It defines parsing, normalization, dependency validation, canonical hashing, a JSON Schema, and golden fixtures. It does not contain local execution, AWS Step Functions states, Lambda ARNs, billing behavior, artifact transfer, or arbitrary plugin loading.
 
@@ -72,14 +70,20 @@ const defaultPlan = canonicalPipeline("cloud");
 
 Executor compatibility remains separate from document validity. A valid Pipeline v1 document may still be unsupported by a particular deployed executor, which must reject it before side effects.
 
+## Installation
+
+```bash
+npm install @tuned-tensor/pipeline-contract
+```
+
+The package is published to npm under the `@tuned-tensor` scope. Consumers should pin an exact version (for example `1.0.0`) rather than tracking a moving range, so contract changes only land through a reviewed release.
+
 ## Published artifacts
 
 - Runtime and TypeScript exports: package root
 - JSON Schema: `@tuned-tensor/pipeline-contract/schema`
 - Golden test vectors: `@tuned-tensor/pipeline-contract/fixtures/*`
 - Stable expected hashes: `fixtures/hashes.json`
-
-The package is present on GitHub but has **not yet been published to npm**. Consumer migrations should pin the first reviewed release exactly rather than depending on the moving `main` branch.
 
 ## Development
 
