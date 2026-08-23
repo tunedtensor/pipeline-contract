@@ -40,13 +40,14 @@ This repository is deliberately **contract-only**. It defines parsing, normaliza
 - `train` produces `model`.
 - `evaluate` consumes `"base"` or a prior `model` reference and produces `report`.
 - `compare` consumes two distinct prior `report` references and produces `comparison`.
-- The only v1 evaluator is `"behavior"`.
+- The adapter evaluator is `"behavior"`. Foundation evaluators are `"bpb"`, `"chat"`, and `"inference"`.
 - Documents contain 1–16 ordered steps.
-- V1 permits at most one training step because current model artifacts are run-scoped.
+- Adapter v1 permits at most one `train` step because LoRA artifacts are run-scoped.
+- Optional `runtime.engine: "foundation"` selects the from-scratch engine. Those documents add `tokenize`, `pretrain`, `finetune`, and `rl` uses, a `tokenizer` artifact, and are local-only. Absent `runtime` keeps the original adapter vocabulary.
 - References must point backward to a compatible producer output.
 - Steps resolve to `local` or `cloud` placement during normalization.
 
-The portable contract permits mixed placement so the CLI can plan explicit boundaries. `validateCloudPipeline()` rejects every local step; hosted execution must never silently reinterpret placement.
+The portable contract permits mixed placement so the CLI can plan explicit boundaries. `validateCloudPipeline()` rejects every local step and every foundation document; hosted execution must never silently reinterpret placement. Consumers should pin **1.1.0** for foundation documents; existing 1.0.0 adapter hashes are unchanged.
 
 ## API
 

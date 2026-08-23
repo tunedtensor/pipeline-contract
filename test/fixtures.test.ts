@@ -13,7 +13,7 @@ describe("published schema and golden fixtures", () => {
     const schema = loadJson("schema/pipeline-v1.schema.json") as Record<string, unknown>;
     const validate = new Ajv2020({ allErrors: true, strict: false }).compile(schema);
 
-    for (const name of ["canonical-cloud", "evaluation-only-local", "mixed-placement"]) {
+    for (const name of ["canonical-cloud", "evaluation-only-local", "mixed-placement", "canonical-foundation"]) {
       const input = loadJson(`fixtures/${name}.input.json`);
       expect(validate(input), `${name}: ${JSON.stringify(validate.errors)}`).toBe(true);
     }
@@ -22,7 +22,7 @@ describe("published schema and golden fixtures", () => {
   it("matches normalized fixtures and fixed cross-repository hashes", () => {
     const hashes = loadJson("fixtures/hashes.json") as Record<string, string>;
 
-    for (const name of ["canonical-cloud", "evaluation-only-local", "mixed-placement"]) {
+    for (const name of ["canonical-cloud", "evaluation-only-local", "mixed-placement", "canonical-foundation"]) {
       const input = loadJson(`fixtures/${name}.input.json`);
       const normalized = loadJson(`fixtures/${name}.normalized.json`);
       expect(parsePipeline(input)).toEqual(normalized);

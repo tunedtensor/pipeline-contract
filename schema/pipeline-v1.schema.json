@@ -10,6 +10,7 @@
     "version": { "const": 1 },
     "name": { "type": "string", "minLength": 1, "maxLength": 120 },
     "target": { "$ref": "#/$defs/target" },
+    "runtime": { "$ref": "#/$defs/runtime" },
     "steps": {
       "type": "array",
       "minItems": 1,
@@ -21,6 +22,14 @@
     "target": {
       "type": "string",
       "enum": ["local", "cloud"]
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engine"],
+      "properties": {
+        "engine": { "const": "foundation" }
+      }
     },
     "stepId": {
       "type": "string",
@@ -68,7 +77,10 @@
                 { "$ref": "#/$defs/artifactReference" }
               ]
             },
-            "evaluator": { "const": "behavior", "default": "behavior" }
+            "evaluator": {
+              "enum": ["behavior", "bpb", "chat", "inference"],
+              "default": "behavior"
+            }
           }
         }
       }
@@ -92,11 +104,95 @@
         }
       }
     },
+    "tokenizeStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uses"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stepId" },
+        "uses": { "const": "tokenize" },
+        "target": { "$ref": "#/$defs/target" },
+        "with": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "vocabSize": { "type": "integer", "minimum": 64, "maximum": 65536 },
+            "maxChars": { "type": "integer", "minimum": 1000, "maximum": 2000000000 }
+          }
+        }
+      }
+    },
+    "pretrainStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uses", "with"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stepId" },
+        "uses": { "const": "pretrain" },
+        "target": { "$ref": "#/$defs/target" },
+        "with": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tokenizer"],
+          "properties": {
+            "tokenizer": { "$ref": "#/$defs/artifactReference" },
+            "depth": { "type": "integer", "minimum": 1, "maximum": 64 },
+            "steps": { "type": "integer", "minimum": 1, "maximum": 10000000 },
+            "batchSize": { "type": "integer", "minimum": 1, "maximum": 1024 },
+            "sequenceLength": { "type": "integer", "minimum": 16, "maximum": 8192 },
+            "nprocPerNode": { "type": "integer", "minimum": 1, "maximum": 16 }
+          }
+        }
+      }
+    },
+    "finetuneStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uses", "with"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stepId" },
+        "uses": { "const": "finetune" },
+        "target": { "$ref": "#/$defs/target" },
+        "with": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["model"],
+          "properties": {
+            "model": { "$ref": "#/$defs/artifactReference" },
+            "steps": { "type": "integer", "minimum": 1, "maximum": 10000000 },
+            "batchSize": { "type": "integer", "minimum": 1, "maximum": 1024 }
+          }
+        }
+      }
+    },
+    "rlStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "uses", "with"],
+      "properties": {
+        "id": { "$ref": "#/$defs/stepId" },
+        "uses": { "const": "rl" },
+        "target": { "$ref": "#/$defs/target" },
+        "with": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["model"],
+          "properties": {
+            "model": { "$ref": "#/$defs/artifactReference" },
+            "steps": { "type": "integer", "minimum": 1, "maximum": 10000000 }
+          }
+        }
+      }
+    },
     "step": {
       "oneOf": [
         { "$ref": "#/$defs/trainStep" },
         { "$ref": "#/$defs/evaluateStep" },
-        { "$ref": "#/$defs/compareStep" }
+        { "$ref": "#/$defs/compareStep" },
+        { "$ref": "#/$defs/tokenizeStep" },
+        { "$ref": "#/$defs/pretrainStep" },
+        { "$ref": "#/$defs/finetuneStep" },
+        { "$ref": "#/$defs/rlStep" }
       ]
     }
   }
