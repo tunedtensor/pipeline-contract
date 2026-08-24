@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "name": "default-foundation",
+  "runtime": {
+    "engine": "foundation"
+  },
+  "steps": [
+    {
+      "id": "tokenize",
+      "uses": "tokenize",
+      "target": "local"
+    },
+    {
+      "id": "pretrain",
+      "uses": "pretrain",
+      "target": "local",
+      "with": {
+        "tokenizer": {
+          "from": "tokenize.tokenizer"
+        },
+        "depth": 2,
+        "steps": 2,
+        "batchSize": 2,
+        "sequenceLength": 64
+      }
+    },
+    {
+      "id": "bpb",
+      "uses": "evaluate",
+      "target": "local",
+      "with": {
+        "model": {
+          "from": "pretrain.model"
+        },
+        "evaluator": "bpb"
+      }
+    },
+    {
+      "id": "sft",
+      "uses": "finetune",
+      "target": "local",
+      "with": {
+        "model": {
+          "from": "pretrain.model"
+        },
+        "steps": 2,
+        "batchSize": 1
+      }
+    },
+    {
+      "id": "chat",
+      "uses": "evaluate",
+      "target": "local",
+      "with": {
+        "model": {
+          "from": "sft.model"
+        },
+        "evaluator": "chat"
+      }
+    },
+    {
+      "id": "infer",
+      "uses": "evaluate",
+      "target": "local",
+      "with": {
+        "model": {
+          "from": "sft.model"
+        },
+        "evaluator": "inference"
+      }
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  canonicalFoundationPipeline,
   canonicalJson,
   canonicalPipeline,
   parsePipeline,
@@ -40,6 +41,10 @@ describe("Pipeline v1 contract", () => {
       train: { inputs: [], outputs: ["model"] },
       evaluate: { inputs: ["model"], outputs: ["report"] },
       compare: { inputs: ["report", "report"], outputs: ["comparison"] },
+      tokenize: { inputs: [], outputs: ["tokenizer"] },
+      pretrain: { inputs: ["tokenizer"], outputs: ["model"] },
+      finetune: { inputs: ["model"], outputs: ["model"] },
+      rl: { inputs: ["model"], outputs: ["model"] },
     });
   });
 
@@ -88,6 +93,34 @@ describe("Pipeline v1 contract", () => {
 
     expect(parsePipeline(mixed).steps.map((step) => step.target)).toEqual(["local", "cloud"]);
     expect(() => validateCloudPipeline(mixed)).toThrow(/targets local execution/);
+  });
+
+  it("accepts the local foundation smoke recipe and rejects it in the cloud", () => {
+    const recipe = canonicalFoundationPipeline();
+    expect(parsePipeline(recipe).runtime).toEqual({ engine: "foundation" });
+    expect(parsePipeline(recipe).steps.map((step) => step.uses)).toEqual([
+      "tokenize",
+      "pretrain",
+      "evaluate",
+      "finetune",
+      "evaluate",
+      "evaluate",
+    ]);
+    expect(() => validateCloudPipeline(recipe)).toThrow(/local-only/i);
+  });
+
+  it("rejects adapter and foundation vocabulary mixed in one document", () => {
+    expect(() => parsePipeline({
+      version: 1,
+      target: "local",
+      steps: [{ id: "tokenize", uses: "tokenize" }],
+    })).toThrow(/runtime.engine/i);
+    expect(() => parsePipeline({
+      version: 1,
+      target: "local",
+      runtime: { engine: "foundation" },
+      steps: [{ id: "train", uses: "train" }],
+    })).toThrow(/cannot include a train step/i);
   });
 
   it.each([
